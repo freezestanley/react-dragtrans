@@ -15,6 +15,7 @@ export default () => {
       <div style={{ height: 50 }}></div>
       <DragResizableBox
         adsorb={false}
+        limit={{left:0,top:0,right:300,bottom:300}}
         rect={{ width: 100, height: 50, top: 0, left: 0 }}
         style={{ backgroundColor: 'rgb(243,235,235)' }}
         relative

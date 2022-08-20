@@ -1,3 +1,11 @@
+/*
+ * @Author: error: git config user.name && git config user.email & please set dead value or install git
+ * @Date: 2022-08-19 11:47:45
+ * @LastEditors: error: git config user.name && git config user.email & please set dead value or install git
+ * @LastEditTime: 2022-08-20 15:09:30
+ * @FilePath: /react-drag-resizable/src/react-drag-resizable/types.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 export type Direction =
   | 'left_top'
   | 'left_bottom'
@@ -8,6 +16,8 @@ export type Direction =
   | 'left'
   | 'right'
   | 'content';
+
+export type CurrentStateType = | 'moving' | 'trans' | 'silence'
 
 export type CollectedRectType = {
   left: number;
@@ -41,6 +51,7 @@ export interface BaseDragResizableBoxPropsProps {
    * @description 传入onChange会使组件受控，需要传入left、top和width、height
    */
   onChange: (rect: CollectedRectType) => void;
+  onClick: (e:MouseEvent) => void;
   /**
    * @default false
    * @description   默认移动位置时相对于 document，如果需要相对于父盒子，请设置为 true
@@ -79,6 +90,56 @@ export interface BaseDragResizableBoxPropsProps {
    * @description 小方块的className
    */
   rectClassName: string;
+  /**
+   * @default true
+   * @description limit开启后是否在拖动的时候出边界，当鼠标UP后回到Limit边界内
+   */
+  limitUpBack?: boolean
+  /**
+   * @default false
+   * @description 当被拖动的时候，是否有选区
+   */
+  Selection?: boolean
+  /**
+   * @argument 参数rect为改变后的left、top、width、height
+   * @description 当发生拖拽过程中
+   */
+  onDrag?: (rect: CollectedRectType) => void;
+  /**
+   * @argument 参数rect为改变后的left、top、width、height
+   * @description 当发生拖拽开始
+   */
+  onDragStart?: (rect: CollectedRectType) => void;
+  /**
+   * @argument 参数rect为改变后的left、top、width、height
+   * @description 当发生拖拽结束
+   */
+  onDragEnd?: (rect: CollectedRectType) => void;
+  /**
+   * @argument 参数rect为改变后的left、top、width、height
+   * @description 当发生变形拖拽
+   */
+  onTrans?: (rect: CollectedRectType) => void;
+  /**
+   * @argument 参数rect为改变后的left、top、width、height
+   * @description 当发生变形开始
+   */
+  onTransStart?: (rect: CollectedRectType) => void;
+  /**
+   * @argument 参数rect为改变后的left、top、width、height
+   * @description 当发生变形结束
+   */
+  onTransEnd?: (rect: CollectedRectType) => void;
+  /**
+   * @argument 
+   * @description 只读是否被激活
+   */
+  isActivied?:boolean,
+  /**
+   * @argument
+   * @description 当被激活点击时
+   */
+  onActive?: () => void,
 }
 
 export type DragResizableBoxProps = Partial<
