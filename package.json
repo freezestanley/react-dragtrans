@@ -1,19 +1,19 @@
 {
   "private": false,
-  "name": "react-drag-resizable",
-  "description": "React component, which can be used to drag and resize, with location limits",
-  "author": "qiuyanxi",
+  "name": "react-dragtrans",
+  "description": "",
+  "author": "",
   "license": "MIT",
-  "version": "1.2.0",
+  "version": "0.1.5",
   "keywords": [
     "React",
     "drag",
     "resize"
   ],
-  "homepage": "https://18888628835.github.io/react-drag-resizable",
+  "homepage": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/18888628835/react-drag-resizable.git"
+    "url": ""
   },
   "files": [
     "dist"
