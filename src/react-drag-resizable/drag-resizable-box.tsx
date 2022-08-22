@@ -544,8 +544,8 @@ const DragResizableBox: React.FC<
         collector.current;
       let offsetX = pointX - getRate(e.pageX, rate);
       let offsetY = pointY - getRate(e.pageY, rate);
-      shiftX = getRate(shiftX, rate)
-      shiftY = getRate(shiftY, rate)
+      // shiftX = getRate(shiftX, rate)
+      // shiftY = getRate(shiftY, rate)
 
       let curCalcRect = handleCalcRect(
         { left, top, width, height },
@@ -595,8 +595,8 @@ const DragResizableBox: React.FC<
       console.log(`move:${status}`)
       let { left, top, width, height, pointX, pointY, shiftX, shiftY } =
         collector.current;
-      let offsetX = getRate(pointX - e.pageX, rate)
-      let offsetY = getRate(pointY - e.pageY, rate)
+      let offsetX = pointX - getRate(e.pageX, rate)
+      let offsetY = pointY - getRate(e.pageY, rate)
 
       let curCalcRect = handleCalcRect(
         { left, top, width, height },
@@ -678,13 +678,13 @@ const DragResizableBox: React.FC<
       // 获取元素矩阵大小
       let { width, height } = box.current?.getBoundingClientRect()!;
       // 存下鼠标点击后的鼠标坐标
-      let pointX = e.pageX,
-        pointY = e.pageY;
+      let pointX = getRate(e.pageX, rate),
+        pointY = getRate(e.pageY, rate);
         // shiftX = getRate(shiftX, rate)
       // shiftY = getRate(shiftY, rate)
       // 鼠标在容器内点击的位置减去容器距离2边的距离
-      let shiftX = getRate(pointX, rate) - left,
-        shiftY = getRate(pointY, rate) - top;
+      let shiftX = pointX - left,
+        shiftY = pointY - top;
 
       // 将所有属性都记录下来
       Object.assign(collector.current, {
