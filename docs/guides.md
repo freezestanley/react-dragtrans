@@ -11,25 +11,57 @@ import { DragResizableBox } from 'react-drag-resizable';
 
 export default () => {
   return (
-    <div style={{ height: '300px', maxWidth: '700px', position: 'relative' }}>
+    <div style={{ height: '1000px', maxWidth: '1000px', position: 'relative', zoom:.5, backgroundColor:'#ff0000' }}>
       <div style={{ height: 50 }}></div>
       <DragResizableBox
         adsorb={false}
+        limit={{left:0,top:0,right:300,bottom:300}}
         rect={{ width: 100, height: 50, top: 0, left: 0 }}
         style={{ backgroundColor: 'rgb(243,235,235)' }}
         relative
+        rate={.5}
         diff={2}
       >
-        <div>move me!</div>
+        <div>top</div>
       </DragResizableBox>
-      <div style={{ height: 50 }}></div>
+      
       <DragResizableBox
         relative
+        rate={.5}
         adsorb={false}
-        rect={{ width: 150, height: 150 }}
+        rect={{ left:0,top:0,width: 150, height: 150 }}
         style={{ backgroundColor: 'rgb(243,235,235)' }}
       >
         <div>move me!</div>
+      </DragResizableBox>
+
+      <DragResizableBox
+        relative
+        rate={.5}
+        adsorb={false}
+        rect={{ left:200,top:0,width: 150, height: 150 }}
+        style={{ backgroundColor: 'rgb(243,235,235)' }}
+      >
+        <div>bottom</div>
+      </DragResizableBox>
+
+
+      <DragResizableBox
+        relative
+        rate={.5}
+        adsorb={false}
+        limit={{ left: 0, top: 0, right: 500, bottom: 500 }}
+        rect={{ width: 100, height: 100, left: 0, top: 0 }}
+        style={{ backgroundColor: '#898989' }}
+      >
+        <div
+          style={{
+            padding: '10px',
+            width: '100%',
+          }}
+        >
+          12313123
+        </div>
       </DragResizableBox>
     </div>
   );
