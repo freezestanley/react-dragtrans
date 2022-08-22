@@ -16,12 +16,14 @@ import { DragResizableBox } from 'react-drag-resizable';
 export default () => {
   return (
     <div
-      style={{ height: '500px', width: '500px', border: '1px solid red',zoom: .5 }}
+      style={{ height: '1000px', width: '1000px', border: '1px solid red', zoom: 1, position: 'relative', zoom: .5}}
     >
       <DragResizableBox
-        rect={{ width: 100, height: 100, left: 450, top: 350 }}
-        limit={{ left: 344, top: 263, right: 1344, bottom: 1263 }}
+        rect={{ width: 100, height: 100, left: 0, top: 0 }}
+        limit={{ left: 0, top: 0, right: 1344, bottom: 1263 }}
         style={{ backgroundColor: 'rgb(243,235,235)' }}
+        relative
+        rate={.5}
       >
         <div
           style={{

@@ -73,11 +73,32 @@ const DragResizableBox: React.FC<
     rectClassName,
     adsorb = true,
     guides = true,
-    limitUpBack = true,
+    limitUpBack = false,
     Selection = true,
+    rate = 1,
     // onClick,
     ...restProps
   } = props;
+
+  //缩放比例  2 > rate >= 0.5 
+  rate = rate < 0.5 ? 0.5 : rate > 2 ? 2 : rate
+  //a 缩放比 b 移动值 c 结果值
+  /**
+   * @description: val 移动值 rate 缩放比
+   * @param {number} val
+   * @param {number} rate
+   * @return {*}
+   */  
+  function getRate (val: number,rate: number) {
+    let result = rate < 1 ? val / rate : val * rate
+    return result
+  }
+  function getRate1 (val: number,rate: number) {
+    let result = rate > 1 ? val / rate : val * rate
+    return result
+  }
+
+
 
   const [currentType, setCurrentType] = useState<CurrentStateType>('silence')
   //允许缩放
@@ -175,8 +196,8 @@ const DragResizableBox: React.FC<
           width = width - offsetX;
           break;
         case 'content':
-          left = e.pageX - shiftX;
-          top = e.pageY - shiftY;
+          left = getRate(e.pageX, rate) - shiftX;
+          top = getRate(e.pageY, rate) - shiftY;
           break;
       }
       return { width, height, left, top };
@@ -517,18 +538,23 @@ const DragResizableBox: React.FC<
   const onTransfrom = useCallback((e:MouseEvent) => onMouseMove(e, 'trans'),[])
 
   const onLayerMouseUp = useCallback((e: MouseEvent, status?: string) => {
-    console.log(`UP:${status}`)
     hiddenLine();
+    debugger
     let { left, top, width, height, pointX, pointY, shiftX, shiftY } =
         collector.current;
-      let offsetX = pointX - e.pageX;
-      let offsetY = pointY - e.pageY;
+      let offsetX = pointX - getRate(e.pageX, rate);
+      let offsetY = pointY - getRate(e.pageY, rate);
+      shiftX = getRate(shiftX, rate)
+      shiftY = getRate(shiftY, rate)
 
       let curCalcRect = handleCalcRect(
         { left, top, width, height },
         { offsetX, offsetY, shiftX, shiftY },
         e,
       );
+
+    // console.log(`UP: e.pageX: ${e.pageX}| e.pageY: ${e.pageY} | offsetX: ${offsetX} | offsetY: ${offsetY} | curCalcRect.top: 
+    // ${curCalcRect.top} | curCalcRect.left: ${curCalcRect.left}`)
       
     if (limit) {
       curCalcRect = handleLimit(curCalcRect, limit);
@@ -545,11 +571,12 @@ const DragResizableBox: React.FC<
       });
     }
 
-
-    // 触发变形
-    onTransEnd && onTransEnd({left,top,width,height})
-      // 触发拖拽
-    onDragEnd && onDragEnd({left,top,width,height})
+    if (active) {
+      // 触发变形
+      onTransEnd && onTransEnd({left,top,width,height})
+        // 触发拖拽
+      onDragEnd && onDragEnd({left,top,width,height})
+    }
     // 失去激活
     setActive(false)
     document.removeEventListener('mousemove', onMove);
@@ -557,23 +584,29 @@ const DragResizableBox: React.FC<
   }, [currentType, active]);
 
   const onMouseUp = useCallback((e: MouseEvent) => {
+    setCurrentType('silence')
     document.removeEventListener('mousemove', onMove);
     document.removeEventListener('mousemove', onTransfrom);
   }, []);
+
 
   const onMouseMove = useCallback(
     (e: MouseEvent, status?: string) => {
       console.log(`move:${status}`)
       let { left, top, width, height, pointX, pointY, shiftX, shiftY } =
         collector.current;
-      let offsetX = pointX - e.pageX;
-      let offsetY = pointY - e.pageY;
+      let offsetX = getRate(pointX - e.pageX, rate)
+      let offsetY = getRate(pointY - e.pageY, rate)
 
       let curCalcRect = handleCalcRect(
         { left, top, width, height },
         { offsetX, offsetY, shiftX, shiftY },
         e,
       );
+
+      // console.log(`MOVE: e.pageX: ${e.pageX}| e.pageY: ${e.pageY} | offsetX: ${offsetX} | offsetY: ${offsetY} | curCalcRect.top: ${curCalcRect.top} | curCalcRect.left: ${curCalcRect.left}`)
+
+
       // 移动时处理辅助线
       if (direction.current === 'content' && guides) {
         hiddenLine();
@@ -585,13 +618,17 @@ const DragResizableBox: React.FC<
           // curCalcRect = limitUpBack ? curCalcRect : handleLimit(curCalcRect, limit);
           curCalcRect = handleLimit(curCalcRect, limit); 
         }
+        //取消选中区
+        Selection ? window?.getSelection()?.collapseToStart() : null;
       } else if (status === 'trans') {
         if (limit){
           curCalcRect = handleLimit(curCalcRect, limit); 
         }
+        //取消选中区
+        Selection ? window?.getSelection()?.collapseToStart() : null;
       }
       
-      
+
       onChange
         ? onChange({
             ...curCalcRect,
@@ -604,25 +641,23 @@ const DragResizableBox: React.FC<
             height: Math.max(minHeight, curCalcRect.height),
           });
 
-        //取消选中区
-        Selection ? window?.getSelection()?.collapseToStart() : null;
-        // 触发变形
-        onTrans && onTrans({left,top,width,height})
-        // 触发拖拽
-        onDrag && onDrag({left,top,width,height})
+        
 
+          if (status === 'moving') { // 拖动移动
+            onDrag && onDrag({left,top,width,height})
+          } else if (status === 'trans') {// 触发拖拽
+            onTrans && onTrans({left,top,width,height})
+          }
     },
     [guides, currentType],
   );
   
 
   const onMouseDown = useCallback((
-  // const onMouseDown = (
       e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
       currentDirection: Direction,
       status?: string
     ) => {
-      console.log(`down:${status}`)
       // e.stopPropagation();
       //收集所有相同移动盒子的 rect 属性
       collectAllBoxRect();
@@ -645,8 +680,11 @@ const DragResizableBox: React.FC<
       // 存下鼠标点击后的鼠标坐标
       let pointX = e.pageX,
         pointY = e.pageY;
-      let shiftX = pointX - left,
-        shiftY = pointY - top;
+        // shiftX = getRate(shiftX, rate)
+      // shiftY = getRate(shiftY, rate)
+      // 鼠标在容器内点击的位置减去容器距离2边的距离
+      let shiftX = getRate(pointX, rate) - left,
+        shiftY = getRate(pointY, rate) - top;
 
       // 将所有属性都记录下来
       Object.assign(collector.current, {
@@ -662,15 +700,16 @@ const DragResizableBox: React.FC<
         bottom,
       });
 
+    //   console.log(`DOWN: e.pageX: ${e.pageX}| e.pageY: ${e.pageY} | shiftX: ${shiftX} | shiftY: ${shiftY} | collector.current.top: 
+    // ${collector.current.top} | collector.current.left: ${collector.current.left}`)
       direction.current = currentDirection;
-      
-      // 触发变形
-      onTransStart && onTransStart({left,top,width,height})
-      // 触发拖拽
-      onDragStart && onDragStart({left,top,width,height})
       if (status === 'trans') {
+        // 触发变形
+        onTransStart && onTransStart({left,top,width,height})
         document.addEventListener('mousemove', onTransfrom);
       } else {
+        // 触发拖拽
+        onDragStart && onDragStart({left,top,width,height})
         document.addEventListener('mousemove', onMove);
       }
       
@@ -679,8 +718,10 @@ const DragResizableBox: React.FC<
     },
     [currentType],
   );
-
   
+  // document.addEventListener('mousemove', (e)=>{
+  //   console.log(`pageX:${e.pageX} pageY: ${e.pageY}`)
+  // });
 
   const onChecked = useCallback(() => setAllowResize(true), []);
 
@@ -780,3 +821,4 @@ const DragResizableBox: React.FC<
 });
 
 export default DragResizableBox;
+
